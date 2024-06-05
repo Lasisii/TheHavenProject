@@ -106,8 +106,8 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     backgroundColor: 'transparent',
-    borderTopWidth: 0, // Remove top border
-    borderRadius: 20, // Adjust border radius as needed
-    overflow: 'hidden', // Clip content to rounded edges
+    borderTopWidth: 0, 
+    borderRadius: 20, 
+    overflow: 'hidden', 
   }
 });
