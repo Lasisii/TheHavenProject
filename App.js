@@ -2,10 +2,13 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screens/loginScreen';
 import HomeScreen from './screens/homeScreen';
+import CoursesScreen from './screens/MyCourse';
+import SubjectDetailScreen from './components/HomeScreen/SubjectDetailScreen';
 import TabNavigation from './navigation/TabNavigation';
 import SignUp from './screens/SignUp';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -43,7 +46,7 @@ enableScreens();
         <Tab.Screen name ='Home' component ={HomeScreen} options={{
           tabBarIcon: ()=> (<Foundation name="home" size={24} color="black" />),
         }}/>
-        <Tab.Screen name ='MyCourse' component ={MyCourse} options={{
+        <Tab.Screen name ='MyCourse' component ={CoursesNavigator} options={{
           tabBarIcon: ()=> (<FontAwesome5 name="book-open" size={20} color="black" />)
         }}/>
         <Tab.Screen name ='LeaderBoard' component ={LeaderBoard}   options={{
@@ -55,6 +58,12 @@ enableScreens();
     </Tab.Navigator>
   );
   
+  const CoursesNavigator = () => (
+    <Stack.Navigator>
+      <Stack.Screen name="Courses" component={MyCourse} options={{ headerShown: false }} />
+      <Stack.Screen name="SubjectDetail" component={SubjectDetailScreen} options={{ title: 'Subject Detail' }} />
+    </Stack.Navigator>
+  );
 
   const AuthStack = () => (
     <Stack.Navigator screenOptions={{headerShown: false}}>

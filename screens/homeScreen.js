@@ -8,6 +8,7 @@ import { auth } from '../firebase';
 import { NavigationContainer } from '@react-navigation/native';
 import TabNavigation from '../navigation/TabNavigation';
 import Header from '../components/HomeScreen/Header';
+import HorizontalCardList from '../components/HomeScreen/HorizontalCardList';
 
 
 const HomeScreen = () => {
@@ -37,7 +38,11 @@ const HomeScreen = () => {
       {user? (
         <>
         <Header/>
+       <View>
+        <HorizontalCardList />
+       </View>
         </>
+
 
 
        

@@ -9,13 +9,12 @@ import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 export default function TabNavigation() {
-    const TabNav =  <Tab.Navigator>
-    <Tab.Screen name ='Home' component ={HomeScreen}/>
-    <Tab.Screen name ='MyCourse' component ={MyCourse}/>
-    <Tab.Screen name ='LeaderBoard' component ={LeaderBoard}/>
-    <Tab.Screen name ='Profile' component ={ProfileScreen}/>
-</Tab.Navigator>
   return (
-   TabNav
+    <Tab.Navigator>
+        <Tab.Screen name ='Home' component ={HomeScreen}/>
+        <Tab.Screen name ='MyCourse' component ={MyCourse}/>
+        <Tab.Screen name ='LeaderBoard' component ={LeaderBoard}/>
+        <Tab.Screen name ='Profile' component ={ProfileScreen}/>
+    </Tab.Navigator>
   )
 }
