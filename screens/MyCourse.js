@@ -14,16 +14,16 @@ const CoursesScreen = () => {
       <Tab.Navigator
         screenOptions={{
           tabBarLabelStyle: {
-            fontSize: 18, // Customize font size
-            fontWeight: 'bold', // Customize font weight
-            fontFamily: 'PoppinsBold', // Use custom font (make sure it's loaded in your project)
-            color: '#002D5D', // Customize label color
+            fontSize: 18, 
+            fontWeight: 'bold', 
+            fontFamily: 'PoppinsBold', 
+            color: '#002D5D', 
             
           },
          
           tabBarIndicatorStyle: {
-            backgroundColor: '#D0AA66', // Customize the color of the indicator line
-            height: 50, // Customize the height of the indicator line
+            backgroundColor: '#D0AA66', 
+            height: 50, 
             Color: 'white'
           },
         }}
