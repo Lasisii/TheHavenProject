@@ -1,39 +1,144 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+/*import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import SubjectsTab from '../components/HomeScreen/SubjectsTab';
-
+//import SubjectsTab from '../components/HomeScreen/SubjectsTab';
+import userplaceholder from '../assets/images/userplaceholder.png'
+import flame from '../assets/images/flame.png'
+import SubjectList from '../components/Courses/SubjectList';
+import { db } from '../firebase';
+import { collection, getDocs } from 'firebase/firestore';
 const Tab = createMaterialTopTabNavigator();
 
-const CoursesScreen = () => {
+const CoursesScreen = ({ route, navigation }) => {
+  const [classIds, setClassIds] = useState([]);
+
+  useEffect(() => {
+    const getClassIds = async () => {
+      try {
+        // Fetch class IDs from your "classes" collection (modify as needed)
+        const classesQuery = query(collection(db, 'classes'));
+        const querySnapshot = await getDocs(classesQuery);
+
+        const fetchedClassIds = querySnapshot.docs.map((doc) => doc.id);
+        setClassIds(fetchedClassIds);
+      } catch (error) {
+        console.error('Error fetching class IDs:', error);
+      }
+    };
+
+    getClassIds();
+  }, []);
   return (
     <View style={styles.container}>
       <View style={styles.topper}>
-      <Text style={styles.title}>Subjects</Text>
+        <Image source ={userplaceholder} style={{ width:30, height: 30, borderRadius:99, margin:10}}/>
+        <Text style={styles.title}>Subjects</Text>
+        <View style={{ display: 'flex', flexDirection: 'row', gap: 0.0002, alignItems: 'center' }}>
+          <Image source={flame} style={{ width: 35, height: 35 }}/>
+          <Text style={{ fontSize: 15, fontFamily: 'PoppinsBold', color: 'gray' }}>1234</Text>
+        </View>
       </View>
       <Tab.Navigator
         screenOptions={{
           tabBarLabelStyle: {
-            fontSize: 18, // Customize font size
-            fontWeight: 'bold', // Customize font weight
-            fontFamily: 'PoppinsBold', // Use custom font (make sure it's loaded in your project)
-            color: '#002D5D', // Customize label color
-            
+            fontSize: 18, 
+            fontWeight: 'bold', 
+            fontFamily: 'PoppinsBold', 
+            color: 'grey', 
           },
-         
           tabBarIndicatorStyle: {
-            backgroundColor: '#D0AA66', // Customize the color of the indicator line
-            height: 50, // Customize the height of the indicator line
-            Color: 'white'
+            backgroundColor: '#D0AA66', 
+            height: 2, 
+            color: 'white' // Fixed typo in Color to color
           },
         }}
       >
-        <Tab.Screen name="1" component={SubjectsTab} />
-        <Tab.Screen name="2" component={SubjectsTab} />
-        <Tab.Screen name="3" component={SubjectsTab} />
-        <Tab.Screen name="4" component={SubjectsTab} />
-        <Tab.Screen name="5" component={SubjectsTab} />
+         {classIds.map((classId) => (
+            <Tab.Screen key={classId} name={classId} component={SubjectList} props={{ classId }} />
+          ))}
       </Tab.Navigator>
+    </View>
+  );
+};
+
+export default CoursesScreen;
+*/
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import SubjectList from '../components/Courses/SubjectList'; // Assuming SubjectList.js is in the Courses folder
+import { db } from '../firebase';
+import userplaceholder from '../assets/images/userplaceholder.png';
+import flame from '../assets/images/flame.png';
+import { collection, getDocs, query } from 'firebase/firestore';
+
+const Tab = createMaterialTopTabNavigator();
+
+const CoursesScreen = () => {
+  const [classIds, setClassIds] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Flag for loading state
+
+  useEffect(() => {
+    const getClassIds = async () => {
+      try {
+        // Fetch class IDs from your "classes" collection (modify as needed)
+        const classesQuery = query(collection(db, 'classes'));
+        const querySnapshot = await getDocs(classesQuery);
+
+        const fetchedClassIds = querySnapshot.docs.map((doc) => doc.id);
+        setClassIds(fetchedClassIds);
+      } catch (error) {
+        console.error('Error fetching class IDs:', error);
+      } finally {
+        setIsLoading(false); // Set loading to false after fetching (or on error)
+      }
+    };
+
+    getClassIds();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.topper}>
+        <Image source={userplaceholder} style={{ width: 30, height: 30, borderRadius: 99, margin: 10 }} />
+        <Text style={styles.title}>Subjects</Text>
+        <View style={{ display: 'flex', flexDirection: 'row', gap: 0.0002, alignItems: 'center' }}>
+          <Image source={flame} style={{ width: 35, height: 35 }} />
+          <Text style={{ fontSize: 15, fontFamily: 'PoppinsBold', color: 'gray' }}>1234</Text>
+        </View>
+      </View>
+      {isLoading ? (
+        <Text>Fetching class IDs...</Text>
+      ) : (
+        classIds.length > 0 ? (
+          <Tab.Navigator
+            screenOptions={{
+              tabBarLabelStyle: {
+                fontSize: 18,
+                fontWeight: 'bold',
+                fontFamily: 'PoppinsBold',
+                color: 'grey',
+              },
+              tabBarIndicatorStyle: {
+                backgroundColor: '#D0AA66',
+                height: 2,
+                color: 'white',
+              },
+            }}
+          >
+            {classIds.map((classId) => (
+              <Tab.Screen 
+                key={classId} 
+                name={classId} 
+                component={SubjectList} 
+                initialParams={{ classId }} // Correct way to pass initial params
+              />
+            ))}
+          </Tab.Navigator>
+        ) : (
+          <Text>No classes found.</Text>
+        )
+      )}
     </View>
   );
 };
@@ -45,16 +150,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    
-   //fontWeight: 'bold',
-    marginTop: 15,
-    paddingLeft:10,
-    fontSize:30 ,
-    fontFamily:'PoppinsBold',
-    color: 'white'
+    fontSize: 20,
+    fontFamily: 'PoppinsBold',
+    color: 'grey'
   },
   topper: {
-    backgroundColor:'#002D5D',
-    marginTop:20
+    backgroundColor: 'white',
+    marginTop: 20,
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 10
   }
 });

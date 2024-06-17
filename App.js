@@ -4,12 +4,14 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
+//import * as React from 'react';
+//import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screens/loginScreen';
 import HomeScreen from './screens/homeScreen';
-import CoursesScreen from './screens/MyCourse';
-import SubjectDetailScreen from './components/HomeScreen/SubjectDetailScreen';
-import TabNavigation from './navigation/TabNavigation';
+//import CoursesScreen from './screens/MyCourse';
+//import SubjectDetailScreen from './components/HomeScreen/SubjectDetailScreen';
+//import TabNavigation from './navigation/TabNavigation';
 import SignUp from './screens/SignUp';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MyCourse from './screens/MyCourse';
@@ -20,8 +22,10 @@ import { Foundation } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
+
 import { enableScreens } from 'react-native-screens';
+//import TopicDetailScreen from './components/HomeScreen/TopicDetailScreen';
+//import LessonScreen from './components/HomeScreen/LessonScreen';
 
 
 
@@ -42,26 +46,31 @@ export default function App() {
   
 enableScreens();
    const Home = () => (
-    <Tab.Navigator screenOptions={{headerShown: false, tabBarShowLabel: false}  }>
+   
+    <Tab.Navigator screenOptions={{headerShown: false, tabBarShowLabel: false, tabBarActiveBackgroundColor: '#D0AA66',  tabBarStyle: styles.tabBar,}  }>
         <Tab.Screen name ='Home' component ={HomeScreen} options={{
-          tabBarIcon: ()=> (<Foundation name="home" size={24} color="black" />),
+          tabBarIcon: ({ focused })=> (<Foundation name="home" size={24} color={focused ? '#002D5D' : 'grey'} />),
         }}/>
         <Tab.Screen name ='MyCourse' component ={CoursesNavigator} options={{
-          tabBarIcon: ()=> (<FontAwesome5 name="book-open" size={20} color="black" />)
+           tabBarIcon: ({ focused }) => (
+            <FontAwesome5 name="book-open" size={20} color={focused ? '#002D5D' : 'grey'} />
+          ),
         }}/>
         <Tab.Screen name ='LeaderBoard' component ={LeaderBoard}   options={{
-          tabBarIcon: ()=> (<MaterialIcons name="leaderboard" size={24} color="black" />)
+          tabBarIcon: ({ focused })=> (<MaterialIcons name="leaderboard" size={24} color={focused ? '#002D5D' : 'grey'} />)
         }}/>
         <Tab.Screen name ='Profile' component ={ProfileScreen}  options={{
-          tabBarIcon: ()=> (<FontAwesome name="user" size={24} color="black" />)
+          tabBarIcon: ({ focused })=> (<FontAwesome name="user" size={24} color={focused ? '#002D5D' : 'grey'}/>)
         }}/>
     </Tab.Navigator>
+   
   );
   
   const CoursesNavigator = () => (
     <Stack.Navigator>
       <Stack.Screen name="Courses" component={MyCourse} options={{ headerShown: false }} />
-      <Stack.Screen name="SubjectDetail" component={SubjectDetailScreen} options={{ title: 'Subject Detail' }} />
+  
+      
     </Stack.Navigator>
   );
 
@@ -105,9 +114,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tabBar: {
-    backgroundColor: 'transparent',
-    borderTopWidth: 0, // Remove top border
-    borderRadius: 20, // Adjust border radius as needed
-    overflow: 'hidden', // Clip content to rounded edges
-  }
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    right: 10,
+    height: 60,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    overflow:'hidden'
+  },
 });

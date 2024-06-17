@@ -35,7 +35,7 @@ const Header =()=>{
                     <Text style={{fontSize: 15, fontFamily:'PoppinsMedium', color:'white', opacity: 0.7, paddingLeft: 5}}>Let's absorb information today!</Text>
                 </View>
             </View>
-        <View style ={{display:'flex', flexDirection:'row', gap: 0.0002, alignItems:'center'}}>
+        <View style ={{display:'flex', flexDirection:'row', gap: 0.0002, alignItems:'center', justifyContent:'center'}}>
             <Image source={flame} style={{width: 35, height: 35}}/>
             <Text style={{ fontSize:15 ,fontFamily:'PoppinsMedium', color: 'white'}}>1234</Text>
         </View>
