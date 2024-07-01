@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet, Text, View, Image } from 'react-native';
+import { FlatList, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { FontAwesome } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const SubjectList = ({ route }) => {
   const { classId } = route.params;
   const [subjects, setSubjects] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -14,8 +16,9 @@ const SubjectList = ({ route }) => {
       (snapshot) => {
         const subjectData = snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data(),
+          name: doc.data().name,
         }));
+        console.log('Fetched subjects:', subjectData); // Debugging log
         setSubjects(subjectData);
       },
       (error) => {
@@ -26,13 +29,19 @@ const SubjectList = ({ route }) => {
     return () => unsubscribe();
   }, [classId]);
 
+  const handleSubjectPress = (item) => {
+    navigation.navigate('TopicList', { classId, subjectId: item.id });
+  };
+
   const renderItem = ({ item }) => (
-    <View style={styles.subjectItem}>
-      <View style={styles.iconContainer}>
-        <FontAwesome name={item.iconName || 'book'} size={24} color="#fff" />
+    <TouchableOpacity onPress={() => handleSubjectPress(item)}>
+      <View style={styles.subjectItem}>
+        <View style={styles.iconContainer}>
+          <FontAwesome name="book" size={24} color="#fff" />
+        </View>
+        <Text style={styles.subjectName}>{item.name}</Text>
       </View>
-      <Text style={styles.subjectName}>{item.name}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -52,16 +61,16 @@ const styles = StyleSheet.create({
   subjectItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f8ff',
-    marginVertical: 8,
-    padding: 15,
+    backgroundColor: 'white',
+    marginVertical: 1,
+    padding: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#dcdcdc',
-    elevation: 2,
+    borderColor: '#D0AA66',
+   // elevation: 2,
   },
   iconContainer: {
-    backgroundColor: '#ff6347',
+    backgroundColor: '#002D5D',
     padding: 10,
     borderRadius: 25,
     marginRight: 15,
@@ -69,7 +78,7 @@ const styles = StyleSheet.create({
   subjectName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'gray',
   },
 });
 

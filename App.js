@@ -22,8 +22,9 @@ import { Foundation } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
-
+import TopicList from './components/Courses/TopicList';
 import { enableScreens } from 'react-native-screens';
+import LessonList from './components/Courses/LessonList';
 //import TopicDetailScreen from './components/HomeScreen/TopicDetailScreen';
 //import LessonScreen from './components/HomeScreen/LessonScreen';
 
@@ -69,7 +70,8 @@ enableScreens();
   const CoursesNavigator = () => (
     <Stack.Navigator>
       <Stack.Screen name="Courses" component={MyCourse} options={{ headerShown: false }} />
-  
+      <Stack.Screen name="TopicList" component={TopicList} />
+      <Stack.Screen name="LessonList" component={LessonList} />
       
     </Stack.Navigator>
   );

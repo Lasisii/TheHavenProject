@@ -69,6 +69,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import SubjectList from '../components/Courses/SubjectList'; // Assuming SubjectList.js is in the Courses folder
 import { db } from '../firebase';
 import userplaceholder from '../assets/images/userplaceholder.png';
+import profileplaceholder from '../assets/images/profileplaceholder.jpg';
 import flame from '../assets/images/flame.png';
 import { collection, getDocs, query } from 'firebase/firestore';
 
@@ -81,7 +82,7 @@ const CoursesScreen = () => {
   useEffect(() => {
     const getClassIds = async () => {
       try {
-        // Fetch class IDs from your "classes" collection (modify as needed)
+       
         const classesQuery = query(collection(db, 'classes'));
         const querySnapshot = await getDocs(classesQuery);
 
@@ -90,7 +91,7 @@ const CoursesScreen = () => {
       } catch (error) {
         console.error('Error fetching class IDs:', error);
       } finally {
-        setIsLoading(false); // Set loading to false after fetching (or on error)
+        setIsLoading(false); 
       }
     };
 
@@ -100,7 +101,7 @@ const CoursesScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.topper}>
-        <Image source={userplaceholder} style={{ width: 30, height: 30, borderRadius: 99, margin: 10 }} />
+        <Image source={profileplaceholder} style={{ width: 40, height: 40, borderRadius: 99, margin: 10 }} />
         <Text style={styles.title}>Subjects</Text>
         <View style={{ display: 'flex', flexDirection: 'row', gap: 0.0002, alignItems: 'center' }}>
           <Image source={flame} style={{ width: 35, height: 35 }} />
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 20,
+    fontSize: 25,
     fontFamily: 'PoppinsBold',
     color: 'grey'
   },
