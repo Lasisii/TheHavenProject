@@ -8,7 +8,6 @@ const LessonList = ({ route }) => {
   const { classId, subjectId, topicId, userId } = route.params;
   const [lessons, setLessons] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState(null);
-  const [dimensions, setDimensions] = useState(Dimensions.get('window'));
 
   useEffect(() => {
     const fetchLessons = async () => {
@@ -24,7 +23,7 @@ const LessonList = ({ route }) => {
           setLessons(lessonData);
 
           if (lessonData.length > 0) {
-            // Check for user's last watched lesson
+            //last watched lesson
             const userDocRef = doc(db, 'users', userId);
             const userDoc = await getDoc(userDocRef);
             const lastWatchedLesson = userDoc.data()?.lastWatchedLesson?.[topicId];
@@ -45,15 +44,6 @@ const LessonList = ({ route }) => {
     };
 
     fetchLessons();
-
-    const handleResize = () => {
-      setDimensions(Dimensions.get('window'));
-    };
-
-    Dimensions.addEventListener('change', handleResize);
-    return () => {
-      Dimensions.removeEventListener('change', handleResize);
-    };
   }, [classId, subjectId, topicId, userId]);
 
   const handleLessonSelect = async (lesson) => {
@@ -79,7 +69,6 @@ const LessonList = ({ route }) => {
   );
 
   const getEmbedLink = (lectureLink) => {
-    // Assume lectureLink is a YouTube URL and extract the video ID
     const videoId = lectureLink.split('v=')[1]?.split('&')[0];
     return `https://www.youtube.com/embed/${videoId}`;
   };
@@ -88,7 +77,7 @@ const LessonList = ({ route }) => {
     <View style={styles.container}>
       {selectedLesson && (
         <WebView
-          style={[styles.webview, { height: dimensions.height * 0.4, width: dimensions.width }]}
+          style={styles.webview}
           source={{ uri: getEmbedLink(selectedLesson.lectureLink) }}
           allowsFullscreenVideo
           javaScriptEnabled
@@ -111,6 +100,7 @@ const styles = StyleSheet.create({
   },
   webview: {
     backgroundColor: '#fff',
+    height: 200, // Adjust height as needed
   },
   listContainer: {
     padding: 10,

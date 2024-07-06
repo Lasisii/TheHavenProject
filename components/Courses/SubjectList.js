@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { FlatList, StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const SubjectList = ({ route }) => {
   const { classId } = route.params;
   const [subjects, setSubjects] = useState([]);
   const navigation = useNavigation();
+  const numColumns = 2;
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, 'classes', classId, 'subjects'),
+      collection(db, `classes/${classId}/subjects`), // Adjusted collection path
       (snapshot) => {
         const subjectData = snapshot.docs.map((doc) => ({
           id: doc.id,
           name: doc.data().name,
+          banner: doc.data().banner,
         }));
-        console.log('Fetched subjects:', subjectData); // Debugging log
+        console.log('Fetched subjects:', subjectData);
         setSubjects(subjectData);
       },
       (error) => {
@@ -34,15 +35,19 @@ const SubjectList = ({ route }) => {
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleSubjectPress(item)}>
-      <View style={styles.subjectItem}>
-        <View style={styles.iconContainer}>
-          <FontAwesome name="book" size={24} color="#fff" />
-        </View>
-        <Text style={styles.subjectName}>{item.name}</Text>
-      </View>
+    <TouchableOpacity onPress={() => handleSubjectPress(item)} style={styles.subjectItem}>
+      <Image source={{ uri: item.banner }} style={styles.subjectBanner} resizeMode="cover" />
+      <Text style={styles.subjectName}>{item.name}</Text>
     </TouchableOpacity>
   );
+
+  if (subjects.length === 0) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <FlatList
@@ -50,6 +55,8 @@ const SubjectList = ({ route }) => {
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContainer}
+      numColumns={numColumns}
+      key={`flatlist-columns-${numColumns}`}
     />
   );
 };
@@ -59,26 +66,35 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   subjectItem: {
-    flexDirection: 'row',
+    flex: 1,
+    margin: 5,
     alignItems: 'center',
     backgroundColor: 'white',
-    marginVertical: 1,
-    padding: 20,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#D0AA66',
-   // elevation: 2,
+   // paddingVertical: 2,
+    paddingBottom: 10,
+    elevation: 2,
   },
-  iconContainer: {
-    backgroundColor: '#002D5D',
-    padding: 10,
-    borderRadius: 25,
-    marginRight: 15,
+  subjectBanner: {
+    width: '100%',
+    height: 150,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    
   },
   subjectName: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    //fontWeight: 'bold',
+    fontFamily:'PoppinsBold',
     color: 'gray',
+    marginTop: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
