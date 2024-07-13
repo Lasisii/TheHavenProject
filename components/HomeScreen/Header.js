@@ -1,19 +1,31 @@
-
-import { View, Text, Image, TextInput, StyleSheet } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { auth } from '../../firebase';
-import userplaceholder from '../../assets/images/userplaceholder.png';
-import flame from '../../assets/images/flame.png'
-import profileplaceholder from '../../assets/images/profileplaceholder.jpg'
+import { View, Text, Image, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import { auth, firestore } from '../../firebase'; // Assuming you have Firestore imported
+import profileplaceholder from '../../assets/images/profileplaceholder.jpg';
+import flame from '../../assets/images/flame.png';
 import { Ionicons } from '@expo/vector-icons';
 
-
 const Header = () => {
-  const [user, setUser] = useState('');
+  const [user, setUser] = useState(null);
+  const [userPoints, setUserPoints] = useState(null); // Initialize points to null initially
+  const [loading, setLoading] = useState(true); // Loading state for points
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
+
+      if (currentUser) {
+        const userDocRef = firestore.collection('users').doc(currentUser.uid);
+        const doc = await userDocRef.get();
+
+        if (doc.exists) {
+          const userData = doc.data();
+          setUserPoints(userData.points); // Set userPoints directly from Firestore data
+          setLoading(false); // Set loading to false once points are fetched
+        }
+      } else {
+        setLoading(false); // Handle loading state when currentUser is null
+      }
     });
 
     return () => unsubscribe();
@@ -29,17 +41,29 @@ const Header = () => {
         <View style={styles.greetingRow}>
           <View style={styles.greetingTextContainer}>
             <View>
-              <Text style={styles.greetingText}>Hello, {user.displayName}</Text>
+              <Text style={styles.greetingText}>
+                Hello, {user?.displayName || 'Guest'}
+              </Text>
               <Text style={styles.subGreetingText}>Let's absorb information today!</Text>
             </View>
           </View>
           <View style={styles.flameContainer}>
             <Image source={flame} style={styles.flameImage} />
-            <Text style={styles.flameText}>1234</Text>
+            {loading ? (
+              <ActivityIndicator color="white" size="small" />
+            ) : (
+              <Text style={styles.flameText}>
+                {userPoints !== null ? userPoints : 'Points Unavailable'}
+              </Text>
+            )}
           </View>
         </View>
         <View style={styles.searchContainer}>
-          <TextInput placeholder='Search Courses' cursorColor='#D0AA66' style={styles.searchInput} />
+          <TextInput
+            placeholder="Search Courses"
+            placeholderTextColor="#D0AA66"
+            style={styles.searchInput}
+          />
           <Ionicons name="search" size={24} color="white" style={styles.searchIcon} />
         </View>
       </View>
@@ -53,9 +77,9 @@ const styles = StyleSheet.create({
     margin: 10,
     backgroundColor: '#002D5D',
     borderRadius: 20,
+    padding: 10,
   },
   topRow: {
-    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -64,18 +88,17 @@ const styles = StyleSheet.create({
   userImage: {
     width: 50,
     height: 50,
-    borderRadius: 99,
+    borderRadius: 25,
     margin: 10,
   },
   greetingRow: {
-    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 10,
     padding: 10,
   },
   greetingTextContainer: {
-    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -92,10 +115,10 @@ const styles = StyleSheet.create({
     paddingLeft: 0,
   },
   flameContainer: {
-    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 10,
   },
   flameImage: {
     width: 35,
@@ -105,24 +128,25 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: 'PoppinsMedium',
     color: 'white',
+    marginLeft: 5,
   },
   searchContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 10,
-    display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 15,
     marginTop: 10,
-    margin: 10,
+    padding: 5,
   },
   searchInput: {
+    flex: 1,
     fontSize: 15,
-    fontFamily: 'PoppinsRegular',
-    opacity: 0.5,
+    color: 'white',
+    marginLeft: 5,
   },
   searchIcon: {
-    opacity: 0.5,
+    marginRight: 5,
   },
 });
 

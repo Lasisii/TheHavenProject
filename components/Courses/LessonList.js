@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
+import { FlatList, StyleSheet, Text, View, TouchableOpacity, Dimensions, Button } from 'react-native';
 import { collection, onSnapshot, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { WebView } from 'react-native-webview';
@@ -8,6 +8,7 @@ const LessonList = ({ route }) => {
   const { classId, subjectId, topicId, userId } = route.params;
   const [lessons, setLessons] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState(null);
+  const [nextLesson, setNextLesson] = useState(null);
 
   useEffect(() => {
     const fetchLessons = async () => {
@@ -23,16 +24,15 @@ const LessonList = ({ route }) => {
           setLessons(lessonData);
 
           if (lessonData.length > 0) {
-            //last watched lesson
             const userDocRef = doc(db, 'users', userId);
             const userDoc = await getDoc(userDocRef);
             const lastWatchedLesson = userDoc.data()?.lastWatchedLesson?.[topicId];
 
-            if (lastWatchedLesson) {
-              setSelectedLesson(lessonData.find((lesson) => lesson.id === lastWatchedLesson) || lessonData[0]);
-            } else {
-              setSelectedLesson(lessonData[0]);
-            }
+            const currentLesson = lastWatchedLesson
+              ? lessonData.find((lesson) => lesson.id === lastWatchedLesson) || lessonData[0]
+              : lessonData[0];
+            setSelectedLesson(currentLesson);
+            setNextLesson(lessonData[lessonData.indexOf(currentLesson) + 1] || null);
           }
         },
         (error) => {
@@ -53,6 +53,15 @@ const LessonList = ({ route }) => {
     await updateDoc(userDocRef, {
       [`lastWatchedLesson.${topicId}`]: lesson.id,
     });
+
+    const currentIndex = lessons.findIndex((l) => l.id === lesson.id);
+    setNextLesson(lessons[currentIndex + 1] || null);
+  };
+
+  const handleNextLesson = () => {
+    if (nextLesson) {
+      handleLessonSelect(nextLesson);
+    }
   };
 
   const renderItem = ({ item }) => (
@@ -76,13 +85,20 @@ const LessonList = ({ route }) => {
   return (
     <View style={styles.container}>
       {selectedLesson && (
-        <WebView
-          style={styles.webview}
-          source={{ uri: getEmbedLink(selectedLesson.lectureLink) }}
-          allowsFullscreenVideo
-          javaScriptEnabled
-          domStorageEnabled
-        />
+        <>
+          <WebView
+            style={styles.webview}
+            source={{ uri: getEmbedLink(selectedLesson.lectureLink) }}
+            allowsFullscreenVideo
+            javaScriptEnabled
+            domStorageEnabled
+          />
+          {nextLesson && (
+            <TouchableOpacity style={styles.nextButton} onPress={handleNextLesson}>
+              <Text style={styles.nextButtonText}>Next</Text>
+            </TouchableOpacity>
+          )}
+        </>
       )}
       <FlatList
         data={lessons}
@@ -125,6 +141,18 @@ const styles = StyleSheet.create({
   lessonDescription: {
     fontSize: 14,
     color: '#004d40',
+  },
+  nextButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 10,
+    backgroundColor: '#00796b',
+    padding: 10,
+    borderRadius: 5,
+  },
+  nextButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 
