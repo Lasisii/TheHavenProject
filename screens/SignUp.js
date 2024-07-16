@@ -13,46 +13,50 @@ export default function SignUp() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
-        navigation.replace('Home');
+        navigation.replace('Homer');
       }
     });
     return unsubscribe;
   }, []);
 
   const handleSignUp = () => {
-    // Check if username is unique
-    const userRef = firestore.collection('users').doc(username);
-    userRef.get().then(docSnapshot => {
-      if (docSnapshot.exists) {
-        alert('Username already taken. Please choose another one.');
-      } else {
+    // Check if username is unique (optional, if you still want to check)
+    // const userRef = firestore.collection('users').doc(username);
+    // userRef.get().then(docSnapshot => {
+    //   if (docSnapshot.exists) {
+    //     alert('Username already taken. Please choose another one.');
+    //   } else {
         // Username is unique, proceed with user creation
         auth
           .createUserWithEmailAndPassword(email, password)
           .then(userCredentials => {
             const user = userCredentials.user;
             user.updateProfile({ displayName: username });
-            console.log('Registered with ', user.email, user.displayName);
 
-            userRef.set({
+            // Use user.uid as the document ID in Firestore
+            const userId = user.uid;
+            const userDocRef = firestore.collection('users').doc(userId); // Use user.uid as the document ID
+
+            userDocRef.set({
               username: username,
-              userId: user.uid,
+              userId: userId,
               email: user.email,
               points: 0,
               topics: {} 
             }).then(() => {
               console.log('User data added to Firestore');
-              navigation.replace('Homer');
+              navigation.replace('Home');
             }).catch(error => {
               console.error('Error adding user data to Firestore:', error);
+              alert('Failed to add user data to Firestore. Please try again.');
             });
           })
           .catch(error => alert(error.message));
-      }
-    }).catch(error => {
-      console.error('Error checking username:', error);
-      alert('Error checking username. Please try again.');
-    });
+    //   }
+    // }).catch(error => {
+    //   console.error('Error checking username:', error);
+    //   alert('Error checking username. Please try again.');
+    // });
   };
 
   return (

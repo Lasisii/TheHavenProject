@@ -5,14 +5,14 @@ import { db } from '../../firebase';
 import { useNavigation } from '@react-navigation/native';
 
 const SubjectList = ({ route }) => {
-  const { classId } = route.params;
+  const { classId, userId } = route.params;
   const [subjects, setSubjects] = useState([]);
   const navigation = useNavigation();
   const numColumns = 2;
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, `classes/${classId}/subjects`), // Adjusted collection path
+      collection(db, `classes/${classId}/subjects`),
       (snapshot) => {
         const subjectData = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -28,10 +28,13 @@ const SubjectList = ({ route }) => {
     );
 
     return () => unsubscribe();
-  }, [classId]);
+  }, [classId, userId]);
+
+  // Log userId to console to check its value
+  console.log('SubjectList userId:', userId);
 
   const handleSubjectPress = (item) => {
-    navigation.navigate('TopicList', { classId, subjectId: item.id });
+    navigation.navigate('TopicList', { classId, subjectId: item.id, userId });
   };
 
   const renderItem = ({ item }) => (
@@ -73,7 +76,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#D0AA66',
-   // paddingVertical: 2,
     paddingBottom: 10,
     elevation: 2,
   },
@@ -82,13 +84,11 @@ const styles = StyleSheet.create({
     height: 150,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    
   },
   subjectName: {
     fontSize: 16,
-    //fontWeight: 'bold',
-    fontFamily:'PoppinsBold',
-    color: 'gray',
+    fontFamily: 'PoppinsBold',
+    color: '#002D5D',
     marginTop: 10,
   },
   loadingContainer: {
