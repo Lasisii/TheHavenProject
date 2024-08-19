@@ -30,8 +30,8 @@ const SubjectList = ({ route }) => {
     return () => unsubscribe();
   }, [classId, userId]);
 
-  // Log userId to console to check its value
-  console.log('SubjectList userId:', userId);
+  
+
 
   const handleSubjectPress = (item) => {
     navigation.navigate('TopicList', { classId, subjectId: item.id, userId });

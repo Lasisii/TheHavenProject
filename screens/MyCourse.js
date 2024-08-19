@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import SubjectList from '../components/Courses/SubjectList'; // Assuming SubjectList.js is in the Courses folder
+import SubjectList from '../components/Courses/SubjectList'; 
 import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
-import { doc, getDoc, collection, query, getDocs } from 'firebase/firestore'; // Import necessary Firestore functions
-import profileplaceholder from '../assets/images/profileplaceholder.jpg';
+import { doc, getDoc, collection, query, getDocs } from 'firebase/firestore'; 
 import flame from '../assets/images/flame.png';
 
 const Tab = createMaterialTopTabNavigator();
 
 const CoursesScreen = () => {
   const [classIds, setClassIds] = useState([]);
-  const [userId, setUserId] = useState(null); // Add state for userId
+  const [userId, setUserId] = useState(null); 
+  const [userProfilePhoto, setUserProfilePhoto] = useState(null); // State for profile photo
+  const [userPoints, setUserPoints] = useState(null); // State for user points
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -25,12 +26,10 @@ const CoursesScreen = () => {
         setClassIds(fetchedClassIds);
       } catch (error) {
         console.error('Error fetching class IDs:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
-    const fetchUserId = async () => {
+    const fetchUserDetails = async () => {
       const auth = getAuth();
       const user = auth.currentUser;
 
@@ -40,33 +39,44 @@ const CoursesScreen = () => {
           const userDocSnapshot = await getDoc(userDocRef);
 
           if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
             setUserId(user.uid);
-            console.log('userId:', user.uid); // Log userId here
+            setUserProfilePhoto(userData.profilePhoto || 'path/to/default/profileImage.jpg'); // Fallback to default image if none provided
+            setUserPoints(userData.points || 0); // Default to 0 if points are not available
           } else {
             console.error('User document does not exist');
           }
         } catch (error) {
-          console.error('Error fetching userId:', error);
+          console.error('Error fetching user details:', error);
         }
       }
+      setIsLoading(false);
     };
 
     fetchClassIds();
-    fetchUserId(); 
+    fetchUserDetails(); 
   }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.topper}>
-        <Image source={profileplaceholder} style={{ width: 40, height: 40, borderRadius: 99, margin: 10 }} />
+        <Image 
+          source={{ uri: userProfilePhoto }} // Use profile photo or fallback
+          style={{ width: 40, height: 40, borderRadius: 99, margin: 10 }} 
+        />
         <Text style={styles.title}>Subjects</Text>
         <View style={{ display: 'flex', flexDirection: 'row', gap: 0.0002, alignItems: 'center' }}>
           <Image source={flame} style={{ width: 35, height: 35 }} />
-          <Text style={{ fontSize: 15, fontFamily: 'PoppinsBold', color: 'gray' }}>1234</Text>
+          <Text style={{ fontSize: 15, fontFamily: 'PoppinsBold', color: 'gray' }}>
+            {userPoints !== null && userPoints !== undefined ? userPoints : 'Points Unavailable'} 
+            {/* Display userPoints if available, otherwise 'Points Unavailable' */}
+          </Text>
         </View>
       </View>
       {isLoading ? (
-        <Text>Fetching class IDs...</Text>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#D0AA66" />
+        </View>
       ) : (
         classIds.length > 0 ? (
           <Tab.Navigator
@@ -94,7 +104,9 @@ const CoursesScreen = () => {
             ))}
           </Tab.Navigator>
         ) : (
-          <Text>No classes found.</Text>
+          <View style={styles.noClassesContainer}>
+            <Text>No classes found.</Text>
+          </View>
         )
       )}
     </View>
@@ -121,6 +133,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 10
-
-  }
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noClassesContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

@@ -1,10 +1,9 @@
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import image from './../assets/images/image.png';
-import { auth, firestore } from '../firebase'; 
+import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { auth, firestore } from '../firebase'; 
 
-export default function SignUp() {
+const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -13,89 +12,78 @@ export default function SignUp() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
-        navigation.replace('Homer');
+        navigation.replace('Home'); 
       }
     });
     return unsubscribe;
-  }, []);
+  }, [navigation]);
 
-  const handleSignUp = () => {
-    // Check if username is unique (optional, if you still want to check)
-    // const userRef = firestore.collection('users').doc(username);
-    // userRef.get().then(docSnapshot => {
-    //   if (docSnapshot.exists) {
-    //     alert('Username already taken. Please choose another one.');
-    //   } else {
-        // Username is unique, proceed with user creation
-        auth
-          .createUserWithEmailAndPassword(email, password)
-          .then(userCredentials => {
-            const user = userCredentials.user;
-            user.updateProfile({ displayName: username });
+  const handleSignUp = async () => {
+    try {
+      const userRef = firestore.collection('users').doc(username);
+      const docSnapshot = await userRef.get();
 
-            // Use user.uid as the document ID in Firestore
-            const userId = user.uid;
-            const userDocRef = firestore.collection('users').doc(userId); // Use user.uid as the document ID
+      if (docSnapshot.exists) {
+        alert('Username already taken. Please choose another one.');
+        return;
+      }
 
-            userDocRef.set({
-              username: username,
-              userId: userId,
-              email: user.email,
-              points: 0,
-              topics: {} 
-            }).then(() => {
-              console.log('User data added to Firestore');
-              navigation.replace('Home');
-            }).catch(error => {
-              console.error('Error adding user data to Firestore:', error);
-              alert('Failed to add user data to Firestore. Please try again.');
-            });
-          })
-          .catch(error => alert(error.message));
-    //   }
-    // }).catch(error => {
-    //   console.error('Error checking username:', error);
-    //   alert('Error checking username. Please try again.');
-    // });
+      const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
+      const user = userCredentials.user;
+
+      await user.updateProfile({ displayName: username });
+
+      const userDocRef = firestore.collection('users').doc(user.uid);
+
+      await userDocRef.set({
+        username: username,
+        userId: user.uid,
+        email: user.email,
+        points: 0,
+        topics: {}
+      });
+
+      console.log('User data added to Firestore');
+      navigation.replace('Home');
+    } catch (error) {
+      console.error('Error during sign up:', error);
+      alert(error.message);
+    }
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior='padding'>
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.inputContainer}>
-        <Image source={image} style={{ width: 100, height: 150, objectFit: 'contain', paddingLeft: 300, marginBottom: 10 }} />
+      <Image source={require('./../assets/images/image.png')} style={styles.image} />
         <Text style={styles.titleText}>New here? Join us now!</Text>
         <TextInput
-          placeholder='Username'
+          placeholder="Username"
           value={username}
-          onChangeText={text => setUsername(text)}
+          onChangeText={setUsername}
           style={styles.input}
         />
         <TextInput
-          placeholder='Email'
+          placeholder="Email"
           value={email}
-          onChangeText={text => setEmail(text)}
+          onChangeText={setEmail}
           style={styles.input}
         />
         <TextInput
-          placeholder='Set Password'
+          placeholder="Set Password"
           value={password}
-          onChangeText={text => setPassword(text)}
+          onChangeText={setPassword}
           style={styles.input}
           secureTextEntry
         />
       </View>
-
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={handleSignUp}
-          style={[styles.button, styles.buttonOutline]}
-        >
+        <TouchableOpacity onPress={handleSignUp} style={[styles.button, styles.buttonOutline]}>
           <Text style={styles.buttonOutlineText}>Register</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -134,12 +122,6 @@ const styles = StyleSheet.create({
     borderColor: '#002D5D',
     borderWidth: 2,
   },
-  buttonText: {
-    color: 'white',
-    fontWeight: '700',
-    fontSize: 16,
-    fontFamily: 'PoppinsRegular'
-  },
   buttonOutlineText: {
     color: '#002D5D',
     fontWeight: '700',
@@ -151,5 +133,14 @@ const styles = StyleSheet.create({
     color: '#002D5D',
     fontFamily: 'PoppinsMedium',
     marginTop: -2
+  },
+  image: {
+    width: 100,
+    height: 150,
+    objectFit: 'contain',
+    paddingLeft: 300,
+    marginBottom: 10
   }
 });
+
+export default SignUp;

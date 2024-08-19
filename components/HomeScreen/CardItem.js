@@ -1,16 +1,25 @@
+// CardItem.js
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import * as Progress from 'react-native-progress';
 
-const CardItem = ({ title, description, imagelink }) => {
+const CardItem = ({ title, description, progress }) => {
+  const progressPercentage = Math.round(progress * 100);
+
   return (
     <View style={styles.card}>
-      <Image source={{ uri: imagelink }} style={styles.image} />
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
-        <TouchableOpacity>
-          <Text style={styles.readMore}>Read More</Text>
-        </TouchableOpacity>
+        <Text style={styles.progressLabel}>Overall Progress: {progressPercentage}%</Text>
+        <Progress.Bar 
+          progress={progress} 
+          width={180} 
+          color={'#B08D57'} 
+          unfilledColor={'#D3D3D3'} 
+          borderWidth={0}
+          style={styles.progressBar} 
+        />
       </View>
     </View>
   );
@@ -18,29 +27,34 @@ const CardItem = ({ title, description, imagelink }) => {
 
 const styles = StyleSheet.create({
   card: {
-    width: 200,
+    width: 270,
+    height: 150,
     backgroundColor: '#fff',
     margin: 10,
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#D0AA66',
     overflow: 'hidden',
   },
-  image: {
-    width: '100%',
-    height: 100,
-  },
   textContainer: {
-    padding: 10,
+    padding: 15,
   },
   title: {
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 20,
+    color: '#002D5D',
   },
   description: {
+    fontSize: 14,
     color: '#9E9E9E',
   },
-  readMore: {
-    color: '#B08D57',
-    marginTop: 5,
+  progressLabel: {
+    marginTop: 50,
+    marginBottom: 5,
+    fontSize: 14,
+    color: '#002D5D',
+  },
+  progressBar: {
+    marginBottom: 10,
   },
 });
 

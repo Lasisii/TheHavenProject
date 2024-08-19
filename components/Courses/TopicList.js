@@ -8,7 +8,7 @@ import { getAuth } from 'firebase/auth';
 const TopicList = ({ route }) => {
   const { classId, subjectId } = route.params;
   const [topics, setTopics] = useState([]);
-  const [userId, setUserId] = useState(null); // State to store userId
+  const [userId, setUserId] = useState(null); 
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -22,8 +22,8 @@ const TopicList = ({ route }) => {
           const userDocSnapshot = await getDoc(userDocRef);
 
           if (userDocSnapshot.exists()) {
-            setUserId(user.uid); // Set userId state
-            console.log('userId:', user.uid); // Log userId here
+            setUserId(user.uid); 
+            console.log('userId:', user.uid);
           } else {
             console.error('User document does not exist');
           }
@@ -37,7 +37,7 @@ const TopicList = ({ route }) => {
   }, []);
 
   useEffect(() => {
-    if (!userId) return; // Return if userId is not set
+    if (!userId) return; 
 
     const unsubscribe = onSnapshot(
       collection(db, 'classes', classId, 'subjects', subjectId, 'topics'),
@@ -48,6 +48,7 @@ const TopicList = ({ route }) => {
           description: doc.data().description,
         }));
         setTopics(topicData);
+        console.log('Fetched topics:', topicData); // Log fetched topics
       },
       (error) => {
         console.error('Error fetching topics: ', error);
@@ -55,7 +56,7 @@ const TopicList = ({ route }) => {
     );
 
     return () => unsubscribe();
-  }, [classId, subjectId, userId]); // Added userId dependency
+  }, [classId, subjectId, userId]); 
 
   const fetchLessons = async (topicId) => {
     const lessonsSnapshot = await getDocs(collection(db, 'classes', classId, 'subjects', subjectId, 'topics', topicId, 'lessons'));
@@ -63,6 +64,7 @@ const TopicList = ({ route }) => {
     lessonsSnapshot.forEach(doc => {
       lessons[doc.data().name] = false;
     });
+    console.log('Fetched lessons for topic:', topicId, lessons); // Log fetched lessons
     return lessons;
   };
 
@@ -70,12 +72,15 @@ const TopicList = ({ route }) => {
     try {
       const lessons = await fetchLessons(topicId);
 
-      // Update Firestore document
       const userDocRef = doc(db, 'users', userId);
-      const topicPath = `topics.${topicName}.lessons`;
+      const topicPath = `topics.${topicName}`;
       const updateObject = {
-        [topicPath]: lessons
+        [`${topicPath}.classId`]: classId,
+        [`${topicPath}.subjectId`]: subjectId,
+        [`${topicPath}.lessons`]: lessons
       };
+
+      console.log('Update object:', updateObject); // Log update object
 
       await updateDoc(userDocRef, updateObject);
       console.log('User topics updated successfully');
@@ -113,14 +118,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
     padding: 25,
     marginVertical: 5,
     borderRadius: 10,
     width: '100%',
-    borderColor:'#002D5D',
+    borderColor: '#002D5D',
     borderWidth: 2
   },
   topicName: {

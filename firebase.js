@@ -31,13 +31,13 @@ const auth = firebase.auth()
 
 export {auth, db};
 */
-// Import the functions you need from the SDKs you need
+
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
 import { getFirestore } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
+
 const firebaseConfig = {
   apiKey: "AIzaSyBXpHBciaSbPE7n1p6cqchFmDP5IkWSdZ0",
   authDomain: "haven-7395d.firebaseapp.com",

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import { auth, firestore } from '../../firebase'; // Assuming you have Firestore imported
-import profileplaceholder from '../../assets/images/profileplaceholder.jpg';
 import flame from '../../assets/images/flame.png';
 import { Ionicons } from '@expo/vector-icons';
 
 const Header = () => {
   const [user, setUser] = useState(null);
-  const [userPoints, setUserPoints] = useState(null); // Initialize points to null initially
-  const [loading, setLoading] = useState(true); // Loading state for points
+  const [userPoints, setUserPoints] = useState(null);
+  const [userProfilePhoto, setUserProfilePhoto] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
@@ -20,12 +20,11 @@ const Header = () => {
 
         if (doc.exists) {
           const userData = doc.data();
-          setUserPoints(userData.points); // Set userPoints directly from Firestore data
-          setLoading(false); // Set loading to false once points are fetched
+          setUserPoints(userData.points);
+          setUserProfilePhoto(userData.profilePhoto); // Get profilePhoto from Firestore
         }
-      } else {
-        setLoading(false); // Handle loading state when currentUser is null
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -36,7 +35,10 @@ const Header = () => {
       <View style={styles.headerContainer}>
         <View style={styles.topRow}>
           <Ionicons name="notifications" size={24} color="white" />
-          <Image source={profileplaceholder} style={styles.userImage} />
+          <Image 
+            source={{ uri: userProfilePhoto || 'path/to/default/profileImage.jpg' }} 
+            style={styles.userImage} 
+          />
         </View>
         <View style={styles.greetingRow}>
           <View style={styles.greetingTextContainer}>
