@@ -44,7 +44,8 @@ const SignUp = () => {
       });
 
       console.log('User data added to Firestore');
-      navigation.replace('Home');
+      navigation.replace('Welcome', { username }); 
+
     } catch (error) {
       console.error('Error during sign up:', error);
       alert(error.message);

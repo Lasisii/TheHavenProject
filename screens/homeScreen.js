@@ -55,7 +55,7 @@ const HomeScreen = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={['#a0e075']} // You can customize the color of the refresh indicator
+              colors={['#a0e075']} 
             />
           }
         />

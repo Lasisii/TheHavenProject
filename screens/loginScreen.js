@@ -11,14 +11,14 @@ const LoginScreen = () => {
     const [loading, setLoading] = useState(false);
     const navigation = useNavigation()
 
-    useEffect(() => {
-      const unsubscribe = auth.onAuthStateChanged(user => {
-            if (user){
-                navigation.replace('Homer')
-            }
-        })
-        return unsubscribe;
-    }, [])
+ //   useEffect(() => {
+  //    const unsubscribe = auth.onAuthStateChanged(user => {
+     //       if (user){
+      //          navigation.replace('Hom')
+        //    }
+       // })
+       // return unsubscribe;
+    //}, [])
 
   //  const handleSignUp =()=>{
       //  auth

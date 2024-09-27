@@ -35,14 +35,12 @@ export default function ProfileScreen() {
   };
 
   const pickImage = async () => {
-    // Request permission to access media library
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert("Permission required", "We need permission to access your media library to select a photo.");
       return;
     }
 
-    // Launch the image picker
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -50,13 +48,12 @@ export default function ProfileScreen() {
       quality: 1,
     });
 
-    console.log("Image Picker Result:", result); // Log the picker result
+    console.log("Image Picker Result:", result); 
 
-    // Check if the result is valid
     if (result.assets && result.assets.length > 0) {
       const imageUri = result.assets[0].uri;
       if (imageUri) {
-        console.log("Selected Image URI:", imageUri); // Log the URI
+        console.log("Selected Image URI:", imageUri); 
         uploadImage(imageUri);
       } else {
         console.log("Image URI is undefined.");

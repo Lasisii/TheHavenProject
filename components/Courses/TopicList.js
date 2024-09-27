@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet, Text, View, TouchableOpacity, Button } from 'react-native';
+import { FlatList, StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { collection, onSnapshot, doc, updateDoc, getDocs, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useNavigation } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
+import { Ionicons } from '@expo/vector-icons';
 
 const TopicList = ({ route }) => {
   const { classId, subjectId } = route.params;
   const [topics, setTopics] = useState([]);
-  const [userId, setUserId] = useState(null); 
+  const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(null);
+  const [userId, setUserId] = useState(null);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -22,7 +25,7 @@ const TopicList = ({ route }) => {
           const userDocSnapshot = await getDoc(userDocRef);
 
           if (userDocSnapshot.exists()) {
-            setUserId(user.uid); 
+            setUserId(user.uid);
             console.log('userId:', user.uid);
           } else {
             console.error('User document does not exist');
@@ -37,7 +40,7 @@ const TopicList = ({ route }) => {
   }, []);
 
   useEffect(() => {
-    if (!userId) return; 
+    if (!userId) return;
 
     const unsubscribe = onSnapshot(
       collection(db, 'classes', classId, 'subjects', subjectId, 'topics'),
@@ -48,15 +51,17 @@ const TopicList = ({ route }) => {
           description: doc.data().description,
         }));
         setTopics(topicData);
-        console.log('Fetched topics:', topicData); // Log fetched topics
+        setLoading(false);
+        console.log('Fetched topics:', topicData);
       },
       (error) => {
         console.error('Error fetching topics: ', error);
+        setLoading(false);
       }
     );
 
     return () => unsubscribe();
-  }, [classId, subjectId, userId]); 
+  }, [classId, subjectId, userId]);
 
   const fetchLessons = async (topicId) => {
     const lessonsSnapshot = await getDocs(collection(db, 'classes', classId, 'subjects', subjectId, 'topics', topicId, 'lessons'));
@@ -64,12 +69,13 @@ const TopicList = ({ route }) => {
     lessonsSnapshot.forEach(doc => {
       lessons[doc.data().name] = false;
     });
-    console.log('Fetched lessons for topic:', topicId, lessons); // Log fetched lessons
+    console.log('Fetched lessons for topic:', topicId, lessons);
     return lessons;
   };
 
   const handleTopicSelect = async (topicId, topicName) => {
     try {
+      setButtonLoading(topicId);
       const lessons = await fetchLessons(topicId);
 
       const userDocRef = doc(db, 'users', userId);
@@ -80,60 +86,88 @@ const TopicList = ({ route }) => {
         [`${topicPath}.lessons`]: lessons
       };
 
-      console.log('Update object:', updateObject); // Log update object
+      console.log('Update object:', updateObject);
 
       await updateDoc(userDocRef, updateObject);
       console.log('User topics updated successfully');
       navigation.navigate('LessonList', { classId, subjectId, topicId, userId });
     } catch (error) {
       console.error('Error updating user topics:', error);
+    } finally {
+      setButtonLoading(null);
     }
   };
 
   const renderItem = ({ item }) => (
     <View style={styles.topicItem}>
-      <TouchableOpacity onPress={() => handleTopicSelect(item.id, item.name)}>
-        <Text style={styles.topicName}>{item.name}</Text>
-        <Text style={styles.topicDescription}>{item.description}</Text>
+      <TouchableOpacity
+        style={styles.topicButton}
+        onPress={() => handleTopicSelect(item.id, item.name)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.topicInfo}>
+          <Text style={styles.topicName}>{item.name}</Text>
+          <Text style={styles.topicDescription}>{item.description}</Text>
+        </View>
+        {buttonLoading === item.id ? (
+          <ActivityIndicator size="small" color="#FFF" />
+        ) : (
+          <Ionicons name="arrow-forward-circle" size={24} color="#FFF" />
+        )}
       </TouchableOpacity>
-      <Button title="Learn" onPress={() => handleTopicSelect(item.id, item.name)} />
     </View>
   );
 
   return (
-    <FlatList
-      data={topics}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.listContainer}
-    />
+    <View style={styles.container}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#002D5D" />
+      ) : (
+        <FlatList
+          data={topics}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F0F4F8',
+    justifyContent: 'center',
+  },
   listContainer: {
-    padding: 10,
+    paddingHorizontal: 15,
   },
   topicItem: {
+    marginVertical: 10,
+    backgroundColor: '#002D5D',
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 3,
+  },
+  topicButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    padding: 25,
-    marginVertical: 5,
-    borderRadius: 10,
-    width: '100%',
-    borderColor: '#002D5D',
-    borderWidth: 2
+    padding: 20,
+  },
+  topicInfo: {
+    flex: 1,
   },
   topicName: {
     fontSize: 20,
-    color: '#002D5D',
-    fontFamily: 'PoppinsBold'
+    color: '#FFF',
+    fontWeight: '700',
   },
   topicDescription: {
     fontSize: 14,
-    color: '#004d40',
+    color: '#BBDEFB',
+    marginTop: 5,
   },
 });
 

@@ -30,7 +30,8 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "CAMERA_ROLL"
-      ]
+      ],
+      "package": "com.kojolasisi.HavenFinal"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -44,6 +45,11 @@
           ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "57473ef9-5951-475f-824e-87b0147121f4"
+      }
+    }
   }
 }

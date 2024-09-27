@@ -46,7 +46,7 @@ const HorizontalCardList = () => {
           };
         });
 
-      console.log('Studied Topics:', studiedTopics); // Debugging log
+      console.log('Studied Topics:', studiedTopics);
 
       setTopics(studiedTopics);
     } catch (error) {

@@ -32,7 +32,6 @@ const SubjectList = ({ route }) => {
 
   
 
-
   const handleSubjectPress = (item) => {
     navigation.navigate('TopicList', { classId, subjectId: item.id, userId });
   };

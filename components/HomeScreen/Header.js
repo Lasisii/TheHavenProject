@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
-import { auth, firestore } from '../../firebase'; // Assuming you have Firestore imported
+import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import { auth, firestore } from '../../firebase'; 
 import flame from '../../assets/images/flame.png';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -21,7 +21,7 @@ const Header = () => {
         if (doc.exists) {
           const userData = doc.data();
           setUserPoints(userData.points);
-          setUserProfilePhoto(userData.profilePhoto); // Get profilePhoto from Firestore
+          setUserProfilePhoto(userData.profilePhoto); 
         }
       }
       setLoading(false);
@@ -60,14 +60,6 @@ const Header = () => {
             )}
           </View>
         </View>
-        <View style={styles.searchContainer}>
-          <TextInput
-            placeholder="Search Courses"
-            placeholderTextColor="#D0AA66"
-            style={styles.searchInput}
-          />
-          <Ionicons name="search" size={24} color="white" style={styles.searchIcon} />
-        </View>
       </View>
     </View>
   );
@@ -75,7 +67,7 @@ const Header = () => {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    height: 250,
+    height: 200,
     margin: 10,
     backgroundColor: '#002D5D',
     borderRadius: 20,
@@ -131,24 +123,6 @@ const styles = StyleSheet.create({
     fontFamily: 'PoppinsMedium',
     color: 'white',
     marginLeft: 5,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 15,
-    marginTop: 10,
-    padding: 5,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    color: 'white',
-    marginLeft: 5,
-  },
-  searchIcon: {
-    marginRight: 5,
   },
 });
 

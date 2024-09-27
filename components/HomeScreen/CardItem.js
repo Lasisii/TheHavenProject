@@ -1,4 +1,4 @@
-// CardItem.js
+
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import * as Progress from 'react-native-progress';

@@ -48,5 +48,15 @@
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
-  "private": true
+  "private": true,
+  "description": "project",
+  "repository": {
+    "type": "git",
+    "url": "HavenTheFirst"
+  },
+  "keywords": [
+    "project"
+  ],
+  "author": "kojokoranteng",
+  "license": "ISC"
 }
